@@ -1,0 +1,8 @@
+#create a ROI (spheres around coordinates)
+#example
+#W = 10 mm
+#lMTG -54, -34, 4 (mni) >> (voxel coordinates (get those from FSLeyes), x,y,z ==> these are put as input in the fslmaths) 
+#sreate a point
+fslmaths MNI152_T1_2mm.nii.gz -roi 72 1 46 1 38 1 0 1 ROIlMTG.nii.gz -odt float
+#create a sphere around it
+fslmaths ROIlMTG.nii.gz -kernel sphere 10 -fmean -bin lMTG_sphere_bin.nii.gz -odt float
