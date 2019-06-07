@@ -6,3 +6,9 @@
 fslmaths MNI152_T1_2mm.nii.gz -roi 72 1 46 1 38 1 0 1 ROIlMTG.nii.gz -odt float
 #create a sphere around it
 fslmaths ROIlMTG.nii.gz -kernel sphere 10 -fmean -bin lMTG_sphere_bin.nii.gz -odt float
+
+>> to create a ROI from the atlas
+#load an atlas, superimpose the contrast >> put cursor on a region>> show >> save as .gz (icon on the left bottom)
+#then you binarize it: 
+fslmaths M1.nii.gz -thr 10 -bin  M1_thresh.nii.gz 
+
