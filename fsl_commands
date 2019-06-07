@@ -12,3 +12,6 @@ fslmaths ROIlMTG.nii.gz -kernel sphere 10 -fmean -bin lMTG_sphere_bin.nii.gz -od
 #then you binarize it: 
 fslmaths M1.nii.gz -thr 10 -bin  M1_thresh.nii.gz 
 
+ >> How to MASK one image with another (i.e. get overlapping region):
+fslmaths first_volume.nii.gz -mas second_volume.nii.gz name_of_output
+
