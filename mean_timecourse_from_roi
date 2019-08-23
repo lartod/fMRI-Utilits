@@ -1,0 +1,49 @@
+%% get mean timecourse from the ROI 
+data_path = '/project/3018025.02/data'; 
+subject_ids = {'SUB02', 'SUB03','SUB05','SUB07','SUB09','SUB10','SUB13','SUB14','SUB16', 'SUB17','SUB18','SUB19','SUB23','SUB24','SUB25','SUB26','SUB27','SUB29','SUB06', 'SUB11','SUB21', 'SUB22'};
+tasks = {'task_AVG_1.gfeat','task_AVG_2.gfeat'};
+contrast = {'cope20.feat', 'cope25.feat'};
+masks_path = '/home/predatt/lartod/fMRI/FaceGender/DATA/FSL_analysis/masks_mvpa';
+atlas = '/home/predatt/lartod/fMRI/MNI_masks_atlases/MNI152_T1_2mm_brain.nii.gz';
+masks = dir(masks_path);msk = {masks(:).name}; msk2 = msk(3:end);
+txt_out_dir = '/project/3018025.02/stats/mean_vals';
+
+for subj = 1:size(subject_ids,2)
+    for tt = 1:size(tasks,2) %task loop
+        cur_data = fullfile(data_path,subject_ids{subj}, 'func', tasks{tt});
+        for cont = 2 %1:size(contrast)
+            data = fullfile(cur_data, contrast{cont}, 'stats', 'zstat1.nii.gz');
+            for m = 1:size(msk2,2) %apply each mask 
+                msk_lbl = strsplit(msk2{m},'.nii');msk_lbl2 = msk_lbl{1};
+                msk_image = fullfile(masks_path,msk2{m});
+                txt_out = strcat(txt_out_dir,'/meants_roi', msk_lbl2, '_COND',num2str(cont), '_TASK', num2str(tt), '_SUBJ', num2str(subj),'.txt');
+                [s, w] = unix(['fslmeants' ' -i ' data  ' -m ' msk_image ' -o ' txt_out]); %apply mask to zstat image+write mean out                
+            end
+        end
+    end
+end
+
+%% put it in one file
+clear all; close all; clc; 
+data_dir = '/project/3018025.02/stats/mean_vals';
+tasks = {'task1', 'task2'};
+conditions = {'rel>unr', 'unr>rel'};
+
+%for subj = 1:22
+    for tt = 1:2
+        for cc = 1 %:2
+            data = fullfile(data_dir, tasks{tt}, conditions{cc});
+            rois = dir(data);rois2 = {rois.name}; rois3 = rois2(3:end);
+            for rr = 1:size(rois3,2) %10 ROIS
+                cur_data = fullfile(data, rois3{rr});
+                cur_subj = dir(cur_data); cur_subj2 = {cur_subj.name};cur_subj3 = cur_subj2(3:end);
+                for subj = 1:size(cur_subj3,2) %22subj in each ROI
+                    read_in = fullfile(cur_data, cur_subj3{subj});
+                    [out1, out2] = textread(read_in);
+                    matrix(subj,rr,tt) = out1;
+                    clear out1
+                end
+            end
+        end
+    end
+%end
